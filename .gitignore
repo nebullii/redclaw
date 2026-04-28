@@ -1,0 +1,11 @@
+.DS_Store
+
+# Generated runtime workspace/state
+configs/workspace/
+
+# Local overrides
+.env
+.env.local
+
+# Vendored runtime git metadata backup
+vendor/zeroclaw/.git-vendored

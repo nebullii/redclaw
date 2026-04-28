@@ -1,0 +1,31 @@
+schema_version = 2
+workspace_dir = "/Users/nehachaudhari/Developer/redclaw/samples/knowledge"
+
+[providers]
+fallback = "ollama"
+
+[providers.models.ollama]
+model = "gemma3:12b"
+timeout_secs = 120
+
+[web_search]
+enabled = false
+
+[autonomy]
+level = "supervised"
+workspace_only = true
+allowed_commands = []
+non_cli_excluded_tools = ["shell", "browser", "browser_open", "http"]
+
+[memory]
+backend = "sqlite"
+auto_save = true
+
+[observability]
+backend = "none"
+runtime_trace_mode = "rolling"
+runtime_trace_path = "state/runtime-trace.jsonl"
+
+[gateway]
+host = "127.0.0.1"
+port = 42617

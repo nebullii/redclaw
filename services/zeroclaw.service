@@ -1,0 +1,22 @@
+[Unit]
+Description=redclaw ZeroClaw Service
+After=network.target vllm.service
+Requires=vllm.service
+
+[Service]
+Type=simple
+User=redclaw
+Group=redclaw
+Environment=ZEROCLAW_CONFIG_DIR=/opt/redclaw/config
+WorkingDirectory=/opt/redclaw
+ExecStart=/usr/local/bin/zeroclaw daemon
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/redclaw /var/lib/redclaw
+
+[Install]
+WantedBy=multi-user.target
