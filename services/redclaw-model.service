@@ -1,0 +1,33 @@
+[Unit]
+Description=RedClaw Local Model Service
+Documentation=https://github.com/nebullii/redclaw
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=redclaw
+Group=redclaw
+EnvironmentFile=-/etc/redclaw/redclaw-model.env
+WorkingDirectory=/var/lib/redclaw
+StateDirectory=redclaw
+LogsDirectory=redclaw
+RuntimeDirectory=redclaw
+CacheDirectory=redclaw-model
+ExecStart=/usr/local/bin/vllm serve ${REDCLAW_MODEL_ID:-Qwen/Qwen2.5-7B-Instruct} --host ${REDCLAW_MODEL_HOST:-127.0.0.1} --port ${REDCLAW_MODEL_PORT:-8000}
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+ReadWritePaths=/var/lib/redclaw /var/log/redclaw /var/cache/redclaw-model
+
+[Install]
+WantedBy=multi-user.target

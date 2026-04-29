@@ -208,6 +208,7 @@ Later:
 
 - [Product Definition](docs/PRODUCT.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Infrastructure](docs/INFRA.md)
 - [MVP](docs/MVP.md)
 - [Principles](docs/PRINCIPLES.md)
 - [GitHub Metadata](docs/GITHUB_METADATA.md)

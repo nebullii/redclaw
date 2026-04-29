@@ -1,0 +1,32 @@
+[Unit]
+Description=RedClaw Loki Log Service
+Documentation=https://github.com/nebullii/redclaw
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=redclaw
+Group=redclaw
+EnvironmentFile=-/etc/redclaw/redclaw-loki.env
+WorkingDirectory=/var/lib/redclaw
+StateDirectory=redclaw
+LogsDirectory=redclaw
+RuntimeDirectory=redclaw
+ExecStart=/usr/local/bin/loki -config.file=/etc/redclaw/loki-config.yml
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+ReadWritePaths=/var/lib/redclaw /var/log/redclaw /etc/redclaw
+
+[Install]
+WantedBy=multi-user.target
