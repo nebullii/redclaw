@@ -18,9 +18,9 @@ What works today:
 
 What is not done yet:
 
-- service packaging for the full stack
-- `Prometheus` integration
-- `Loki` integration
+- end-to-end validation of the packaged service stack
+- live `Prometheus` scraping validation
+- live `Loki` ingestion validation
 - hardened `RHEL` deployment path
 - end-user installation flow
 
@@ -173,6 +173,32 @@ cd /Users/nehachaudhari/Developer/redclaw
 ```
 
 The script prints the exact command to run the dedicated `zeroclaw` binary with the current tool policy.
+
+For the target RHEL layout, a bootstrap skeleton is also available:
+
+```bash
+cd /Users/nehachaudhari/Developer/redclaw
+./scripts/bootstrap-rhel.sh plan
+```
+
+The script can stage units, configs, and the seeded workspace into a target root without trying to install host packages automatically.
+
+For the target deployment path, the staged config is `configs/zeroclaw-vllm.toml`, not the macOS dev profile. That target config enables the Prometheus observer so the `zeroclaw` gateway on `127.0.0.1:42617` emits real `/metrics` output for scraping.
+
+There is also a simple runtime validation helper for the target stack:
+
+```bash
+cd /Users/nehachaudhari/Developer/redclaw
+./scripts/validate-stack.sh
+```
+
+It checks:
+
+- `vLLM` health on `/health`
+- `vLLM` metrics on `/metrics`
+- `zeroclaw` health on `/health`
+- `zeroclaw` metrics on `/metrics`
+- optional readiness for Prometheus and Loki
 
 ## Deployment Direction
 

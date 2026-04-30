@@ -1,6 +1,5 @@
-workspace_dir = "/opt/redclaw/workspace"
-default_provider = "local"
-default_model = "Qwen/Qwen2.5-7B-Instruct"
+schema_version = 2
+workspace_dir = "/var/lib/redclaw/workspace"
 
 [providers]
 fallback = "local"
@@ -10,13 +9,21 @@ kind = "vllm"
 base_url = "http://127.0.0.1:8000/v1"
 model = "Qwen/Qwen2.5-7B-Instruct"
 
+[web_search]
+enabled = false
+
 [autonomy]
 level = "supervised"
 workspace_only = true
 allowed_commands = []
 non_cli_excluded_tools = ["shell", "browser", "browser_open", "http"]
 
+[memory]
+backend = "sqlite"
+auto_save = true
+
 [observability]
+backend = "prometheus"
 runtime_trace_mode = "rolling"
 runtime_trace_path = "state/runtime-trace.jsonl"
 

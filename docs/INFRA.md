@@ -204,6 +204,8 @@ Suggested internal structure:
 Current repo-local equivalents:
 
 - `configs/config.toml`
+  -> current macOS/Ollama dev profile
+- `configs/zeroclaw-vllm.toml`
   -> future `/etc/redclaw/config.toml`
 - `prometheus/prometheus.yml`
   -> future `/etc/redclaw/prometheus.yml`
@@ -237,6 +239,69 @@ The repo currently carries packaged service templates:
 - `services/redclaw-loki.service`
 
 These should be treated as the canonical RHEL-facing unit baseline.
+
+## Bootstrap Flow
+
+The repo now includes a staging bootstrap helper:
+
+- `scripts/bootstrap-rhel.sh plan`
+  - prints the target layout, staged files, and manual follow-up steps
+- `scripts/bootstrap-rhel.sh install`
+  - creates the filesystem layout
+  - installs unit files under the configured systemd directory
+  - installs the target `vLLM` config as `/etc/redclaw/config.toml`
+  - installs env and observability config templates under `/etc/redclaw`
+  - seeds `/var/lib/redclaw/workspace` from `samples/knowledge`
+
+The script intentionally does not try to:
+
+- install host packages with `dnf`
+- create system users automatically
+- choose one distribution-specific binary source for `zeroclaw`, `vLLM`, `Prometheus`, or `Loki`
+
+That is deliberate. The current goal is to make the layout and service contracts reproducible first, then layer package installation and host-specific policy on top.
+
+## Validated Metrics Contracts
+
+The current infra contract is based on the actual vendored `zeroclaw` source and current `vLLM` docs:
+
+- `redclaw-zeroclaw.service`
+  - runs `zeroclaw daemon`
+  - binds the gateway to `127.0.0.1:42617` by default
+  - serves `GET /metrics` on the gateway
+  - only emits real Prometheus metrics when `[observability] backend = "prometheus"`
+- `redclaw-model.service`
+  - runs `vllm serve`
+  - binds to `127.0.0.1:8000` by default
+  - exposes Prometheus-compatible metrics at `GET /metrics` on the OpenAI-compatible API server
+
+Because of that:
+
+- the target packaged config must use `configs/zeroclaw-vllm.toml`, not the macOS dev config
+- the target packaged config must keep `[observability] backend = "prometheus"`
+- `prometheus/prometheus.yml` can use default `/metrics` scraping for both services
+
+## Validation Flow
+
+The repo includes a simple endpoint validator:
+
+- `scripts/validate-stack.sh`
+
+Default checks:
+
+- model health: `http://127.0.0.1:8000/health`
+- model metrics: `http://127.0.0.1:8000/metrics`
+- zeroclaw health: `http://127.0.0.1:42617/health`
+- zeroclaw metrics: `http://127.0.0.1:42617/metrics`
+- Prometheus readiness: `http://127.0.0.1:9090/-/ready` if present
+- Loki readiness: `http://127.0.0.1:3100/ready` if present
+
+Override points are environment-driven:
+
+- `REDCLAW_MODEL_BASE_URL`
+- `REDCLAW_ZEROCLAW_BASE_URL`
+- `REDCLAW_PROMETHEUS_BASE_URL`
+- `REDCLAW_LOKI_BASE_URL`
 
 ## RHEL Packaging Notes
 
